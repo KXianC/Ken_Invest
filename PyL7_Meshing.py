@@ -49,10 +49,9 @@ def Key_Stats(gather="Total Debt/Equity (mrq)"):
                 try:
                     try:
                         value = float(source.split(gather + ':</td><td class="yfnc_tabledata1">')[1].split('</td>')[0])
-                    except Exception as e:
-                        value = float(source.split(gather + ':</td><td class="yfnc_tabledata1">')[1].split('</td>')[0])
-                        # print(str(e))
-                        # time.sleep(15)
+                    except:
+                        value = float(
+                            source.split(gather + ':</td>\n<td class="yfnc_tabledata1">')[1].split('</td>')[0])
 
                     try:
                         sp500_date = datetime.fromtimestamp(unix_time).strftime('%Y-%m-%d')
@@ -62,9 +61,36 @@ def Key_Stats(gather="Total Debt/Equity (mrq)"):
                         sp500_date = datetime.fromtimestamp(unix_time - 259200).strftime('%Y-%m-%d')
                         row = sp500_df[(sp500_df.index == sp500_date)]
                         sp500_value = float(row["Adj Close"])
+                    try:
+                        stock_price = float(source.split('</small><big><b>')[1].split('</b></big>')[0])
+                    except:
 
-                    stock_price = float(source.split('</small><big><b>')[1].split('</b></big>')[0])
-                    # print("stock_price:",stock_price,"ticker:", ticker)
+                        try:
+                            stock_price = (source.split('</small><big><b>')[1].split('</b></big>')[0])
+                            # print(stock_price)
+
+                            stock_price = re.search(r'(\d{1,8}\.\d{1,8})', stock_price)
+
+                            stock_price = float(stock_price.group(1))
+                            # print(stock_price)
+
+
+
+                        except:
+
+                            try:
+                                stock_price = (source.split('<span class="time_rtq_ticker">')[1].split('</span>')[0])
+                                # print(stock_price)
+
+                                stock_price = re.search(r'(\d{1,8}\.\d{1,8})', stock_price)
+
+                                stock_price = float(stock_price.group(1))
+                                # print(stock_price)
+
+                            except:
+
+                                print('wtf stock price lol', ticker, file, value)
+                                time.sleep(5)
 
                     if not starting_stock_value:
                         starting_stock_value = stock_price
